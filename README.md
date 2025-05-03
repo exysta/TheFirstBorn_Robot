@@ -28,65 +28,54 @@ A compact, modular mobile robot designed for autonomous indoor navigation and in
 *   **Wireless:** Leveraging RPi 5's built-in Wi-Fi and Bluetooth for RC and telemetry.
 *   **Construction:** Primarily 3D printed or laser-cut plastic components.
 
-## High-Level Block Diagram
+## High‑Level Block Diagram
 
 ```mermaid
 graph TD
-    subgraph Robot Platform (~15x15cm)
-        %% Power System
-        subgraph Power System
-            BATT[LiPo Battery (2S, 7.4V)] --> PWR_MGMT{Power Management (Protection, Regulators)};
-            PWR_MGMT --> V5{+5V Power Rail};
-            PWR_MGMT --> V3{+3.3V Power Rail};
-        end
+subgraph Robot_Platform["Robot Platform 15x15 cm"]
+  subgraph Power_System["Power System"]
+    BATT["LiPo Battery (2S, 7.4 V)"] --> PWR_MGMT["Power Mgmt: Protection & Regulators"]
+    PWR_MGMT --> V5["+5 V Rail"]
+    PWR_MGMT --> V3["+3.3 V Rail"]
+  end
+  subgraph Processing_Core["Processing Core"]
+    STM32H7["STM32H7 Board"] -->|UART| RPI5["Raspberry Pi 5"]
+    STM32H7 -->|+3.3 V| V3
+    RPI5 -->|+5 V| V5
+  end
+  subgraph Locomotion_System["Locomotion"]
+    STM32H7 -->|PWM/Control| M_DRV["Motor Driver (Dual H‑Bridge)"]
+    M_DRV --> PWR_MGMT
+    M_DRV --> M1["Motor 1 (Left)"]
+    M_DRV --> M2["Motor 2 (Right)"]
+    M1 --> TR_L["Track Left"]
+    M2 --> TR_R["Track Right"]
+  end
+  subgraph Initial_Sensors["Initial Sensors"]
+    STM32H7 -->|GPIO/ADC| IR_SENS["IR Sensors (Line/Prox)"]
+    STM32H7 -->|Trig/Echo| US_SENS["Ultrasonic Sensor"]
+    IR_SENS -->|+3.3 V| V3
+    US_SENS -->|+5 V| V5
+  end
+  subgraph Future_Expansion["Future Expansion"]
+    RPI5 -.-> CAM["Camera (USB/CSI)"]
+    STM32H7 -.-> IMU["IMU Sensor (I2C/SPI)"]
+  end
+  subgraph Wireless_Comm["Wireless Communication"]
+    RPI5 --> WIFI["Wi‑Fi"]
+    RPI5 --> BT["Bluetooth"]
+  end
+end
 
-        %% Processing Core
-        subgraph Processing
-            STM32H7[STM32H7 Board] -- UART --> RPI5[Raspberry Pi 5];
-            STM32H7 -- +3.3V --> V3;
-            RPI5 -- +5V --> V5;
-        end
+REMOTE["Remote Device (Phone/PC)"] -->|Wi‑Fi/BT| WIFI
+REMOTE -->|Wi‑Fi/BT| BT
+CHARGER["LiPo Charger"] -->|Charging Cable| BATT
 
-        %% Locomotion
-        subgraph Locomotion
-            STM32H7 -- PWM/Control --> M_DRV[Motor Driver (Dual H-Bridge)];
-            M_DRV -- Power --> PWR_MGMT;
-            M_DRV --> M1[Motor 1 (Left)];
-            M_DRV --> M2[Motor 2 (Right)];
-            M1 --> TR_L[Track Left];
-            M2 --> TR_R[Track Right];
-        end
+style PWR_MGMT fill:#f9f,stroke:#333,stroke-width:2px
+style M_DRV    fill:#ccf,stroke:#333,stroke-width:2px
+style STM32H7  fill:#cfc,stroke:#333,stroke-width:2px
+style RPI5     fill:#cff,stroke:#333,stroke-width:2px
 
-        %% Sensing (Initial)
-        subgraph Initial Sensors
-            STM32H7 -- GPIO/ADC --> IR_SENS[IR Sensors (Line/Prox)];
-            STM32H7 -- Trig/Echo --> US_SENS[Ultrasonic Sensor (HC-SR04)];
-            IR_SENS -- +3.3V --> V3;
-            US_SENS -- +5V --> V5; %% Often 5V tolerant/powered
-        end
-
-         %% Future Sensors (Examples)
-         subgraph Future Expansion
-            RPI5 -. USB/CSI .-> CAM[Camera];
-            STM32H7 -. I2C/SPI .-> IMU[IMU Sensor];
-         end
-
-        %% Wireless Communication (via RPi)
-        subgraph Wireless
-            RPI5 --> WIFI{Built-in Wi-Fi};
-            RPI5 --> BT{Built-in Bluetooth};
-        end
-    end
-
-    %% External Elements
-    REMOTE[Remote Device (Phone/PC)] -- Wi-Fi/BT --> WIFI;
-    REMOTE -- Wi-Fi/BT --> BT;
-    CHARGER[LiPo Charger] -- Charging Cable --> BATT;
-
-    style PWR_MGMT fill:#f9f,stroke:#333,stroke-width:2px
-    style M_DRV fill:#ccf,stroke:#333,stroke-width:2px
-    style STM32H7 fill:#cfc,stroke:#333,stroke-width:2px
-    style RPI5 fill:#cff,stroke:#333,stroke-width:2px
 ```
 
 ## Folder Structure
