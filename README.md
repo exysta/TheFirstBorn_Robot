@@ -31,50 +31,62 @@ A compact, modular mobile robot designed for autonomous indoor navigation and in
 ## High‑Level Block Diagram
 
 ```mermaid
+%%{init: {
+  "flowchart": {
+    "useMaxWidth": false,
+    "diagramPadding": 20,
+    "nodeSpacing": 60,
+    "rankSpacing": 60
+  },
+  "themeVariables": {
+    "fontSize": "16px",
+    "edgeLabelFontSize": "14px"
+  }
+}}%%
 graph TD
-subgraph Robot_Platform["Robot Platform 15x15 cm"]
-  subgraph Power_System["Power System"]
-    BATT["LiPo Battery (2S, 7.4 V)"] --> PWR_MGMT["Power Mgmt: Protection & Regulators"]
-    PWR_MGMT --> V5["+5 V Rail"]
-    PWR_MGMT --> V3["+3.3 V Rail"]
+  subgraph Robot_Platform["Robot Platform 15x15 cm"]
+    subgraph Power_System["Power System"]
+      BATT["LiPo Battery (2S, 7.4 V)"] --> PWR_MGMT["Power Mgmt: Protection & Regulators"]
+      PWR_MGMT --> V5["+5 V Rail"]
+      PWR_MGMT --> V3["+3.3 V Rail"]
+    end
+    subgraph Processing_Core["Processing Core"]
+      STM32H7["STM32H7 Board"] -->|UART| RPI5["Raspberry Pi 5"]
+      STM32H7 -->|+3.3 V| V3
+      RPI5 -->|+5 V| V5
+    end
+    subgraph Locomotion_System["Locomotion"]
+      STM32H7 -->|PWM/Control| M_DRV["Motor Driver (Dual H‑Bridge)"]
+      M_DRV --> PWR_MGMT
+      M_DRV --> M1["Motor 1 (Left)"]
+      M_DRV --> M2["Motor 2 (Right)"]
+      M1 --> TR_L["Track Left"]
+      M2 --> TR_R["Track Right"]
+    end
+    subgraph Initial_Sensors["Initial Sensors"]
+      STM32H7 -->|GPIO/ADC| IR_SENS["IR Sensors (Line/Prox)"]
+      STM32H7 -->|Trig/Echo| US_SENS["Ultrasonic Sensor"]
+      IR_SENS -->|+3.3 V| V3
+      US_SENS -->|+5 V| V5
+    end
+    subgraph Future_Expansion["Future Expansion"]
+      RPI5 -.-> CAM["Camera (USB/CSI)"]
+      STM32H7 -.-> IMU["IMU Sensor (I2C/SPI)"]
+    end
+    subgraph Wireless_Comm["Wireless Communication"]
+      RPI5 --> WIFI["Wi‑Fi"]
+      RPI5 --> BT["Bluetooth"]
+    end
   end
-  subgraph Processing_Core["Processing Core"]
-    STM32H7["STM32H7 Board"] -->|UART| RPI5["Raspberry Pi 5"]
-    STM32H7 -->|+3.3 V| V3
-    RPI5 -->|+5 V| V5
-  end
-  subgraph Locomotion_System["Locomotion"]
-    STM32H7 -->|PWM/Control| M_DRV["Motor Driver (Dual H‑Bridge)"]
-    M_DRV --> PWR_MGMT
-    M_DRV --> M1["Motor 1 (Left)"]
-    M_DRV --> M2["Motor 2 (Right)"]
-    M1 --> TR_L["Track Left"]
-    M2 --> TR_R["Track Right"]
-  end
-  subgraph Initial_Sensors["Initial Sensors"]
-    STM32H7 -->|GPIO/ADC| IR_SENS["IR Sensors (Line/Prox)"]
-    STM32H7 -->|Trig/Echo| US_SENS["Ultrasonic Sensor"]
-    IR_SENS -->|+3.3 V| V3
-    US_SENS -->|+5 V| V5
-  end
-  subgraph Future_Expansion["Future Expansion"]
-    RPI5 -.-> CAM["Camera (USB/CSI)"]
-    STM32H7 -.-> IMU["IMU Sensor (I2C/SPI)"]
-  end
-  subgraph Wireless_Comm["Wireless Communication"]
-    RPI5 --> WIFI["Wi‑Fi"]
-    RPI5 --> BT["Bluetooth"]
-  end
-end
 
-REMOTE["Remote Device (Phone/PC)"] -->|Wi‑Fi/BT| WIFI
-REMOTE -->|Wi‑Fi/BT| BT
-CHARGER["LiPo Charger"] -->|Charging Cable| BATT
+  REMOTE["Remote Device (Phone/PC)"] -->|Wi‑Fi/BT| WIFI
+  REMOTE -->|Wi‑Fi/BT| BT
+  CHARGER["LiPo Charger"] -->|Charging Cable| BATT
 
-style PWR_MGMT fill:#f9f,stroke:#333,stroke-width:2px
-style M_DRV    fill:#ccf,stroke:#333,stroke-width:2px
-style STM32H7  fill:#cfc,stroke:#333,stroke-width:2px
-style RPI5     fill:#cff,stroke:#333,stroke-width:2px
+  style PWR_MGMT fill:#f9f,stroke:#333,stroke-width:2px
+  style M_DRV    fill:#ccf,stroke:#333,stroke-width:2px
+  style STM32H7  fill:#cfc,stroke:#333,stroke-width:2px
+  style RPI5     fill:#cff,stroke:#333,stroke-width:2px
 
 ```
 
