@@ -77,7 +77,7 @@ graph TD
         end
 
         subgraph HW["Hardware"]
-            POWER["Power System (2S LiPo & Regulators)"]
+            POWER["Power System (18650 Li-Ion battery pack & Regulators)"]
             CHASSIS["Chassis & Motors"]
             CAMERA["Camera (CSI/USB)"]
         end
