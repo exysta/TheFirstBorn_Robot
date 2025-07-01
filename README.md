@@ -1,6 +1,7 @@
 
 # TheFirstBorn - Advanced Autonomous Mobile Robot
 
+![WIP](https://img.shields.io/badge/status-WIP-yellow.svg)
 ![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)
 ![ROS 2 Jazzy](https://img.shields.io/badge/ROS%202-Jazzy-blueviolet)
 ![Zephyr RTOS](https://img.shields.io/badge/Zephyr-RTOS-6f42c1)
