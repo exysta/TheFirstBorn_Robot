@@ -183,7 +183,8 @@ graph TD
 
 *   [Project Requirements](./docs/requirements.md)
 *   [Design Decision Log](./docs/decisions_log.md)
-  
+*   [Components list](./docs/components.md)
+
 ## License
 
 This project is licensed under the Apache License, Version 2.0.  
