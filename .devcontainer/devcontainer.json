@@ -1,0 +1,42 @@
+{
+  "name": "Zephyr + micro-ROS (Jazzy) DevContainer",
+
+  "build": {
+    "dockerfile": "Dockerfile",
+    "context": ".."
+  },
+
+  "workspaceFolder": "/workspaces/Zephyr_MicroROS_Workspace",
+
+  // Remove this entire mounts section to avoid duplicate mount
+  // "mounts": [
+  //   "source=${localWorkspaceFolder},target=/workspaces/Zephyr_MicroROS_Workspace,type=bind,consistency=cached"
+  // ],
+
+  "postCreateCommand": "/workspaces/Zephyr_MicroROS_Workspace/.devcontainer/post-create.sh",
+  "postAttachCommand": "bash -c 'source /workspaces/Zephyr_MicroROS_Workspace/.venv/bin/activate && source /opt/ros/jazzy/setup.bash'",
+
+  "runArgs": [
+    "--privileged",
+    "--network=host"
+  ],
+
+  "containerEnv": {
+    "ZEPHYR_BASE": "/zephyrproject/zephyr"
+  },
+
+  "customizations": {
+    "vscode": {
+      "settings": {
+        "terminal.integrated.defaultProfile.linux": "bash",
+        "terminal.integrated.scrollback": 2000
+      },
+      "extensions": [
+        "ms-vscode.cpptools",
+        "ms-python.python",
+        "marus25.cortex-debug",
+        "ms-vscode.cmake-tools"
+      ]
+    }
+  }
+}

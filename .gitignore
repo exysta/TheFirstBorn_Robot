@@ -50,3 +50,33 @@ modules.order
 Module.symvers
 Mkfile.old
 dkms.conf
+
+# Python virtual environment
+.venv/
+venv/
+env/
+
+# ROS 2 workspace build artifacts
+build/
+install/
+log/
+
+
+# CMake and build system files
+CMakeFiles/
+CMakeCache.txt
+*.cmake
+Makefile
+
+# Zephyr build directories (if applicable)
+zephyr/build/
+out/
+
+# Micro-ROS specific
+micro_ros_setup/build/
+micro_ros_setup/install/
+
+# Misc editor/temp files
+*.swp
+*~
+.DS_Store
