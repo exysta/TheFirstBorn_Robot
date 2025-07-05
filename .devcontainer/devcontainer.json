@@ -3,19 +3,21 @@
 
   "build": {
     "dockerfile": "Dockerfile",
-    "context": ".."
+    "context": "..",
+      "args": {
+    "WORKSPACE_DIR": "${containerWorkspaceFolder}"
+  }
   },
 
-  "workspaceFolder": "/workspaces/Zephyr_MicroROS_Workspace",
+  // "workspaceFolder": "/workspaces/Zephyr_MicroROS_Workspace",
 
   // Remove this entire mounts section to avoid duplicate mount
   // "mounts": [
   //   "source=${localWorkspaceFolder},target=/workspaces/Zephyr_MicroROS_Workspace,type=bind,consistency=cached"
   // ],
 
-  "postCreateCommand": "/workspaces/Zephyr_MicroROS_Workspace/.devcontainer/post-create.sh",
-  "postAttachCommand": "bash -c 'source /workspaces/Zephyr_MicroROS_Workspace/.venv/bin/activate && source /opt/ros/jazzy/setup.bash'",
-
+  "postCreateCommand": "${containerWorkspaceFolder}/.devcontainer/post-create.sh",
+  "postAttachCommand": "grep -qxF 'source \"${containerWorkspaceFolder}/.venv/bin/activate\" && source /opt/ros/jazzy/setup.bash && export ZEPHYR_BASE=\"${containerWorkspaceFolder}/zephyrproject/zephyr\"' ~/.bashrc || echo 'source \"${containerWorkspaceFolder}/.venv/bin/activate\" && source /opt/ros/jazzy/setup.bash && export ZEPHYR_BASE=\"${containerWorkspaceFolder}/zephyrproject/zephyr\"' >> ~/.bashrc",
   "runArgs": [
     "--privileged",
     "--network=host"

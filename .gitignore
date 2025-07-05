@@ -71,6 +71,7 @@ Makefile
 # Zephyr build directories (if applicable)
 zephyr/build/
 out/
+zephyrproject/
 
 # Micro-ROS specific
 micro_ros_setup/build/

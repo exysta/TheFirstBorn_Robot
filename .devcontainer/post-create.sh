@@ -1,12 +1,17 @@
 #!/bin/bash
 set -euo pipefail
 set -x  # Print each command before execution
-set +u  # disable 'unbound variable' checks
+set +u  # disable 'unbound variable' checks temporarily
 
 echo "--- Post-Create: Starting workspace setup ---"
+
+# Detect workspace root (assuming script is run from workspace root)
+WORKSPACE_PATH="$(pwd)"
+VENV_PATH="$WORKSPACE_PATH/.venv"
+
 sudo apt update
+
 # Activate or create virtual environment
-VENV_PATH="/workspaces/Zephyr_MicroROS_Workspace/.venv"
 if [ -f "$VENV_PATH/bin/activate" ]; then
     echo "--- Activating existing Python virtual environment ---"
     source "$VENV_PATH/bin/activate"
@@ -18,16 +23,16 @@ else
     pip install west
 
     # Initialize and fetch Zephyr project
-    west init /zephyrproject
-    cd /zephyrproject
+    ZEPHYR_DIR="$WORKSPACE_PATH/zephyrproject"
+    west init "$ZEPHYR_DIR"
+    cd "$ZEPHYR_DIR"
     west update
     west zephyr-export
 
-    # Install Python dependencies explicitly
-    pip install -r /zephyrproject/zephyr/scripts/requirements.txt || echo "Zephyr requirements.txt not found"
-    pip install -r /zephyrproject/bootloader/mcuboot/zephyr/requirements.txt || echo "MCUBoot requirements.txt not found"
+    pip install -r zephyr/scripts/requirements.txt || echo "Zephyr requirements.txt not found"
+    pip install -r bootloader/mcuboot/zephyr/requirements.txt || echo "MCUBoot requirements.txt not found"
 
-    cd /zephyrproject/zephyr
+    cd "$ZEPHYR_DIR/zephyr"
     west sdk install
 
     echo "--- Virtual environment created and activated ---"
@@ -39,17 +44,22 @@ export AMENT_TRACE_SETUP_FILES=0
 export AMENT_PYTHON_EXECUTABLE=$(which python3)
 export AMENT_PREFIX_PATH=""
 source "/opt/ros/$ROS_DISTRO/setup.bash"
+
 pip3 install catkin_pkg lark-parser empy colcon-common-extensions
 
 # Clone micro-ROS setup
 echo "--- Post-Create: Installing ROS dependencies ---"
-mkdir -p /microros_ws
-cd /microros_ws
-git clone -b "$ROS_DISTRO" https://github.com/micro-ROS/micro_ros_setup.git src/micro_ros_setup
+MICROROS_WS="$WORKSPACE_PATH/microros_ws"
+mkdir -p "$MICROROS_WS"
+cd "$MICROROS_WS"
+
+if [ ! -d "src/micro_ros_setup" ]; then
+    git clone -b "$ROS_DISTRO" https://github.com/micro-ROS/micro_ros_setup.git src/micro_ros_setup
+fi
 
 # Install dependencies
 rosdep update
-rosdep install --from-paths src --ignore-src -y
+rosdep install --from-paths src --ignore-src -y || echo "rosdep install failed — some packages may be missing."
 
 # Build micro-ROS tools
 echo "--- Post-Create: Building micro-ROS tools ---"
