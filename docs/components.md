@@ -73,4 +73,4 @@ This document lists the core hardware components used in the design and developm
 ## 📎 Related Files
 
 - [README.md](./README.md) – Full project overview  
-- [design_decisions.md](./docs/decisions_log.md) – Justification for selected parts  
+- [design_decisions.md](./decisions_log.md) – Justification for selected parts  
