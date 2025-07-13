@@ -3,28 +3,18 @@
 
   "build": {
     "dockerfile": "Dockerfile",
-    "context": "..",
-      "args": {
-    "WORKSPACE_DIR": "${containerWorkspaceFolder}"
-  }
+    "context": ".."
   },
 
-  // "workspaceFolder": "/workspaces/Zephyr_MicroROS_Workspace",
+"postAttachCommand": "grep -qxF 'source \"/opt/zephyr-venv/bin/activate\" && source /opt/ros/jazzy/setup.bash && export ZEPHYR_BASE=\"/opt/zephyrproject/zephyr\"' ~/.bashrc || echo 'source \"/opt/zephyr-venv/bin/activate\" && source /opt/ros/jazzy/setup.bash && export ZEPHYR_BASE=\"/opt/zephyrproject/zephyr\"' >> ~/.bashrc",
 
-  // Remove this entire mounts section to avoid duplicate mount
-  // "mounts": [
-  //   "source=${localWorkspaceFolder},target=/workspaces/Zephyr_MicroROS_Workspace,type=bind,consistency=cached"
-  // ],
-
-  "postCreateCommand": "${containerWorkspaceFolder}/.devcontainer/post-create.sh",
-  "postAttachCommand": "grep -qxF 'source \"${containerWorkspaceFolder}/.venv/bin/activate\" && source /opt/ros/jazzy/setup.bash && export ZEPHYR_BASE=\"${containerWorkspaceFolder}/zephyrproject/zephyr\"' ~/.bashrc || echo 'source \"${containerWorkspaceFolder}/.venv/bin/activate\" && source /opt/ros/jazzy/setup.bash && export ZEPHYR_BASE=\"${containerWorkspaceFolder}/zephyrproject/zephyr\"' >> ~/.bashrc",
   "runArgs": [
     "--privileged",
     "--network=host"
   ],
 
   "containerEnv": {
-    "ZEPHYR_BASE": "/zephyrproject/zephyr"
+    "ZEPHYR_BASE": "/opt/zephyrproject/zephyr"
   },
 
   "customizations": {
@@ -37,7 +27,12 @@
         "ms-vscode.cpptools",
         "ms-python.python",
         "marus25.cortex-debug",
-        "ms-vscode.cmake-tools"
+        "ms-vscode.cmake-tools",
+        "llvm-vs-code-extensions.vscode-clangd",
+        "ms-iot.vscode-ros",
+        "zephyrprojectrtos.zephyr-tools",
+        "eamodio.gitlens",
+        "aaron-bond.better-comments"
       ]
     }
   }
