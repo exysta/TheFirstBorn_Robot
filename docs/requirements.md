@@ -15,7 +15,7 @@ The primary goal of this project is to create a modern, advanced autonomous mobi
 The design and implementation shall adhere to the following high-level principles:
 
 *   **Modularity:** The system is built on a split-compute architecture, separating real-time control from high-level processing.
-*   **Industry-Standard Tooling:** The project shall leverage professional and modern tools like ROS 2, Zephyr RTOS, and Docker.
+*   **Industry-Standard Tooling:** The project shall leverage professional and modern tools like ROS 2, FreeRTOS, and Docker.
 *   **Reproducibility:** The development and deployment environment shall be consistent, portable, and easy to set up using containerization.
 *   **Scalability:** The architecture shall support the future addition of more complex sensors, actuators, and AI capabilities.
 *   **Open Source:** The project will be developed under the Apache 2.0 license.
@@ -34,7 +34,7 @@ The design and implementation shall adhere to the following high-level principle
 ### 3.2. Firmware Layer (Real-Time Control)
 
 *   **FR-FW-01:** The firmware shall run on an STM32H7 microcontroller.
-*   **FR-FW-02:** The firmware shall be built upon the Zephyr Real-Time Operating System (RTOS).
+*   **FR-FW-02:** The firmware shall be built upon the FreeRTOS Real-Time Operating System (RTOS).
 *   **FR-FW-03:** The firmware shall perform hard real-time tasks, including motor control via PWM.
 *   **FR-FW-04:** The firmware shall read wheel encoder data to calculate and publish odometry information.
 *   **FR-FW-05:** The firmware shall interface with and read data from the IMU.
@@ -63,7 +63,7 @@ The design and implementation shall adhere to the following high-level principle
 
 *   **NFR-TS-01:** **Microcontroller:** STM32H7A3.
 *   **NFR-TS-02:** **Single-Board Computer:** Raspberry Pi 5.
-*   **NFR-TS-03:** **Firmware OS:** Zephyr RTOS.
+*   **NFR-TS-03:** **Firmware OS:** FreeRTOS.
 *   **NFR-TS-04:** **High-Level OS:** Ubuntu 24.04 (or compatible).
 *   **NFR-TS-05:** **Robotics Framework:** ROS 2 Jazzy.
 *   **NFR-TS-06:** **Development Environment:** The entire high-level software environment shall be containerized using **Docker** and orchestrated with Docker Compose for reproducibility.
@@ -73,7 +73,7 @@ The design and implementation shall adhere to the following high-level principle
 
 ### 4.2. Performance
 
-*   **NFR-P-01:** All safety-critical motor control and sensor reading tasks shall meet hard real-time deadlines, managed by the Zephyr RTOS on the STM32.
+*   **NFR-P-01:** All safety-critical motor control and sensor reading tasks shall meet hard real-time deadlines, managed by the FreeRTOS on the STM32.
 *   **NFR-P-02:** The communication link between the microcontroller and the Raspberry Pi (micro-ROS over USB-CDC) shall be robust and have sufficient bandwidth for odometry and command data.
 
 ## 5. Phased Implementation Plan & Status
@@ -84,8 +84,9 @@ The requirements will be implemented incrementally across several phases. This p
 | :---- | :------------------------------------------------------------------------------------------------------------------------------------------- | :---------------- |
 | **0** | **Architecture & Technology Selection**                                                                                                      | ✅ **Complete**   |
 | **1** | **Hardware Design & Fabrication**<br/>- Component selection<br/>- PCB design & fabrication<br/>- Chassis design & fabrication                  | ⬜️ **Planned**      |
-| **2** | **Firmware Development (STM32)**<br/>- Zephyr RTOS setup<br/>- Motor & encoder drivers<br/>- IMU driver<br/>- micro-ROS node (`/cmd_vel`, `/odom`) | ⬜️ **Planned**      |
+| **2** | **Firmware Development (STM32)**<br/>- FreeRTOS setup<br/>- Motor & encoder drivers<br/>- IMU driver<br/>- micro-ROS node (`/cmd_vel`, `/odom`) | ⬜️ **Planned**      |
 | **3** | **High-Level Software (Raspberry Pi)**<br/>- Dockerized ROS 2 environment<br/>- Basic teleoperation<br/>- Robot Description (URDF)              | ⬜️ **Planned**      |
 | **4** | **Integration & SLAM**<br/>- STM32/RPi communication<br/>- `slam_toolbox` configuration<br/>- Odometry and TF tuning                          | ⬜️ **Planned**      |
 | **5** | **Autonomous Navigation**<br/>- Nav2 stack configuration & tuning<br/>- Goal-based navigation                                                  | ⬜️ **Planned**      |
 | **6** | **AI & Advanced Capabilities**<br/>- Object detection node (TFLite)<br/>- (Optional) Rust node implementation                                  | ⬜️ **Future Goal**  |
+
