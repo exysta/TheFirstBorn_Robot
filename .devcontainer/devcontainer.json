@@ -1,21 +1,20 @@
 {
-  "name": "Zephyr + micro-ROS (Jazzy) DevContainer",
+  "name": "micro-ROS DevContainer",
 
   "build": {
     "dockerfile": "Dockerfile",
     "context": ".."
   },
-
-"postAttachCommand": "grep -qxF 'source \"/opt/zephyr-venv/bin/activate\" && source /opt/ros/jazzy/setup.bash && export ZEPHYR_BASE=\"/opt/zephyrproject/zephyr\"' ~/.bashrc || echo 'source \"/opt/zephyr-venv/bin/activate\" && source /opt/ros/jazzy/setup.bash && export ZEPHYR_BASE=\"/opt/zephyrproject/zephyr\"' >> ~/.bashrc",
+"postCreateCommand": "git config --global --add safe.directory /workspaces/TheFirstBorn_Robot",
+"postAttachCommand": "grep -qxF 'source /opt/ros/jazzy/setup.bash' ~/.bashrc || echo 'source /opt/ros/jazzy/setup.bash' >> ~/.bashrc",
 
   "runArgs": [
     "--privileged",
-    "--network=host"
+    "--network=host",
+    "--device=/dev/ttyACM0" 
+
   ],
 
-  "containerEnv": {
-    "ZEPHYR_BASE": "/opt/zephyrproject/zephyr"
-  },
 
   "customizations": {
     "vscode": {
@@ -33,7 +32,7 @@
         "zephyrprojectrtos.zephyr-tools",
         "eamodio.gitlens",
         "aaron-bond.better-comments"
-      ]
+      ] 
     }
   }
 }

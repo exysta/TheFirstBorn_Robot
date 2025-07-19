@@ -1,0 +1,7 @@
+https://github.com/micro-ROS/micro_ros_setup/tree/jazzy
+https://github.com/micro-ROS/micro_ros_zephyr_module/tree/jazzy
+https://micro.ros.org/docs/tutorials/core/first_application_rtos/zephyr/
+https://docs.zephyrproject.org/latest/boards/st/nucleo_h7a3zi_q/doc/index.html
+
+might be useful: 
+https://www.zephyrproject.org/ros-2-on-microcontrollers-with-micro-ros-zephyr/

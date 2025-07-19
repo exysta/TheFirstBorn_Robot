@@ -1,0 +1,35 @@
+## Micro ros building
+cd ~/workspaces/TheFirstBorn_Robot/software/microros_ws
+source install/setup.bash
+ros2 run micro_ros_setup create_firmware_ws.sh zephyr nucleo_h743zi
+ros2 run micro_ros_setup configure_firmware.sh ping_pong -t serial
+ros2 run micro_ros_setup build_firmware.sh
+ros2 run micro_ros_setup flash_firmware.sh
+root@DESKTOP-4E0HFON:/workspaces/TheFirstBorn_Robot/software/microros_ws# st-flash --connect-under-reset read verify.bin 0x08000000 $(stat -c%s firmware/build/zephyr/zephyr.bin)
+st-flash --connect-under-reset write firmware/build/zephyr/zephyr.bin 0x08000000
+
+##On host device to link
+usbipd list
+usbipd bind --busid <busid>
+usbipd attach --wsl --busid <busid>
+
+need to add   "runArgs": [
+    "--device=/dev/ttyACM0"
+  ] to devcontainer.json and rebuild container once the port was atached on host machine
+
+
+ros2 run micro_ros_agent micro_ros_agent serial --dev /dev/ttyACM0
+
+##Flashing on stm32: 
+Using cubeide : 
+
+- go to Debug config
+- select <app>.elf file in main tab
+- apply
+- Debug
+
+##run micro ros agent : 
+ros2 run micro_ros_setup create_agent_ws.sh
+ros2 run micro_ros_setup build_agent.sh
+source install/local_setup.sh
+ros2 run micro_ros_agent micro_ros_agent serial --dev /dev/ttyACM0
