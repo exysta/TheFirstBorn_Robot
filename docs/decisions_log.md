@@ -4,14 +4,14 @@ This log records key design decisions made during the development of the "TheFir
 
 **Format:**
 
-*   **Date:** Date the decision was finalized. DD-MM-YYYY
-*   **Topic:** Area of the design the decision relates to.
-*   **Options Considered:** Brief list of alternatives evaluated.
-*   **Decision:** The chosen approach or component.
+*   **Date:** Date the decision was finalized. DD-MM-YYYY  
+*   **Topic:** Area of the design the decision relates to.  
+*   **Options Considered:** Brief list of alternatives evaluated.  
+*   **Decision:** The chosen approach or component.  
 *   **Rationale:** Justification for the decision (pros/cons, cost, availability, requirements alignment, etc.).
 
 ---
-**Date:** 01-07-2025  
+**Date:** 10-08-2025  
 **Topic:** Final Architecture and Core Technologies  
 **Options Considered:**  
 - RTOS + Custom Firmware  
@@ -21,10 +21,39 @@ This log records key design decisions made during the development of the "TheFir
 - Linux-only ROS 2 implementation
 
 **Decision:**  
-Use **FreeRTOS** with **micro-ROS** on **STM32H7A3**, and **ROS 2 Jazzy** containerized on **Raspberry Pi 5** using **Docker Compose**.
+Switch from **STM32H7A3** to **ESP32-S3** due to hardware failure (STM32H7A3 got fried). Use **FreeRTOS** with **micro-ROS** on **ESP32-S3**, and **ROS 2 Jazzy** containerized on **Raspberry Pi 5** using **Docker Compose**.
 
 **Rationale:**  
-FreeRTOS offers a lightweight, widely-supported RTOS foundation with a small footprint and real-time determinism suitable for STM32H7. It has active community support, clean integration with micro-ROS, and ample examples. ROS 2 Jazzy on Docker provides a professional, reproducible development environment on RPi 5, enabling scalable and maintainable robotics architecture.
+ESP32-S3 offers a reliable, cost-effective alternative with good micro-ROS support and integrated USB-to-UART features. The switch allows continuation of development without major architectural changes while avoiding costly STM32 hardware replacement. The combination maintains real-time performance, hardware support, and ROS 2 ecosystem compatibility.
+
+---
+
+**Date:** 10-08-2025  
+**Topic:** IMU Selection  
+**Options Considered:**  
+- ICM-20948  
+- MPU-9250  
+- ICM-45686  
+
+**Decision:**  
+Switch IMU to **ICM-45686** for improved accuracy and performance.
+
+**Rationale:**  
+The ICM-45686 provides enhanced sensor fidelity and improved motion tracking, better suiting the updated ESP32-S3 hardware and overall system goals. It has good availability and integrates well with the ESP32 environment.
+
+---
+
+**Date:** 10-08-2025  
+**Topic:** Battery Selection  
+**Options Considered:**  
+- Li-Ion 18650 pack (previous)  
+- LiPo 3S battery  
+
+**Decision:**  
+Switch battery to **LiPo 3S** for higher voltage and improved power density.
+
+**Rationale:**  
+The LiPo 3S battery offers better energy density and discharge rates, supporting longer operation and higher current demands of the new hardware configuration. It aligns with updated power management design considerations.
 
 ---
 
@@ -96,4 +125,3 @@ FreeRTOS offers a lightweight, widely-supported RTOS foundation with a small foo
 *   ~ €200+ (More flexibility)
 **Decision:** Target ~€100 / $100 for new components.  
 **Rationale:** Stems from user requirement for an "affordable" hobby project. Excludes cost of existing STM32H7 board and RPi 5. Requires careful component selection, particularly for motors, drivers, and potentially chassis materials (favoring DIY/3D printing).
-

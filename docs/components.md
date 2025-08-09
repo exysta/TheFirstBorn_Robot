@@ -9,8 +9,8 @@ This document lists the core hardware components used in the design and developm
 | Component              | Model / Description                           | Notes                                             |
 |------------------------|-----------------------------------------------|---------------------------------------------------|
 | **High-Level SBC**     | Raspberry Pi 5 (8GB)                          | Runs ROS 2 Jazzy in a Docker container.           |
-| **Real-Time MCU**      | STM32H7A3 Nucleo Board                        | Handles motor control, encoder readout, IMU, etc. |
-| **Firmware Platform**  | Zephyr RTOS                                   | Chosen for its modularity and RTOS features.      |
+| **Real-Time MCU**      | ESP32 S3 board                                | Handles motor control, encoder readout, IMU, etc. |
+| **Firmware Platform**  |  Free  RTOS                                   | Chosen for its simplicity and RTOS features.      |
 
 ---
 
@@ -22,7 +22,7 @@ This document lists the core hardware components used in the design and developm
 | **Motors**              | N20 or similar DC gear motors                | Compact, cost-effective, good torque.             |
 | **Motor Drivers**       | TB6612FNG Dual H-Bridge or equivalent        | Reliable and STM32-compatible.                    |
 | **Encoders**            | Magnetic or optical encoders (motor-mounted) | Used for odometry.                                |
-| **Power Supply**        | Lion Battery (~7.4V, 2000–3000mAh)        | Main power source.                                |
+| **Power Supply**        | Lipo 3S Battery (~12V, 2000–3000mAh)         | Main power source.                                |
 | **Voltage Regulators**  | 5V / 3.3V step-down modules (e.g. MP1584)    | Power MCU, SBC, and peripherals.                  |
 
 ---
@@ -30,10 +30,10 @@ This document lists the core hardware components used in the design and developm
 ## 📡 Sensors
 
 | Component             | Model / Description                            | Notes                                             |
-|------------------------|------------------------------------------------|---------------------------------------------------|
-| **IMU**               | BNO080 / BNO085 (GY-BNO080 Module)            | 9DOF + onboard sensor fusion (AHRS).              |
-| **Proximity Sensors** | HC-SR04 (Ultrasonic) + TCRT5000 (IR)          | Basic obstacle avoidance and edge detection.      |
-| **Camera**            | Raspberry Pi Camera Module (v2 or HQ)         | For future vision-based features.                 |
+|------------------------|-----------------------------------------------|---------------------------------------------------|
+| **IMU**               | ICM-45686                                      | 9DOF + onboard sensor fusion (AHRS).              |
+| **Proximity Sensors** | HC-SR04 (Ultrasonic) + TCRT5000 (IR)           | Basic obstacle avoidance and edge detection.      |
+| **Camera**            | Raspberry Pi Camera Module (v2 or HQ)          | For future vision-based features.                 |
 
 ---
 
