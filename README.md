@@ -5,50 +5,56 @@
 ![ROS 2 Jazzy](https://img.shields.io/badge/ROS%202-Jazzy-blueviolet)
 ![FreeRTOS](https://img.shields.io/badge/FreeRTOS-RTOS-6f42c1)
 ![Dockerized](https://img.shields.io/badge/Containerized-Docker-blue)
-![Platform: Raspberry Pi 5](https://img.shields.io/badge/Platform-Raspberry%20Pi%205-orange)
-![Microcontroller: ESP32-S3](https://img.shields.io/badge/MCU-ESP32--S3-lightgrey)
+![Platform: STM32H7A3](https://img.shields.io/badge/Platform-STM32H7A3-orange)
+![Wireless: ESP32-S3](https://img.shields.io/badge/Wireless-ESP32--S3-lightgrey)
 
-**TheFirstBorn is a modern, autonomous mobile robot built on a professional-grade software and hardware stack. It integrates a real-time ESP32-S3 microcontroller running FreeRTOS with a high-performance Raspberry Pi 5 for advanced navigation and AI tasks within the ROS 2 ecosystem.**
+**TheFirstBorn is a modern, autonomous mobile robot built on a professional-grade software and hardware stack. It integrates a real-time STM32H7A3 microcontroller running FreeRTOS for direct sensor input and motor control, with an ESP32-S3 acting as a wireless communication module within the ROS 2 ecosystem.**
 
 This project serves as a comprehensive showcase of skills in embedded systems, real-time programming, robotics software integration, and hardware design.
 
 ## Key Features
 
-*   **Split-Compute Architecture:** Real-time control on ESP32-S3, high-level processing on Raspberry Pi 5.
+*   **Split-Compute Architecture:** Real-time control on STM32H7A3, wireless communication via ESP32-S3, high-level processing on a companion computer (e.g., Raspberry Pi 5 - *to be integrated later*).
 *   **Professional Robotics Framework:** Natively built for **ROS 2**, with the low-level controller integrated into the ROS 2 graph as a native node via **micro-ROS**.
-*   **Autonomous Navigation:** Capable of **SLAM** (Simultaneous Localization and Mapping) and fully autonomous, path-planned navigation with the **Nav2** stack.
-*   **AI-Powered Perception:** Supports deployment of lightweight AI models (e.g., TFLite) for onboard object detection and classification.
-*   **Reproducible Development:** The entire high-level software environment is **containerized with Docker**, ensuring a consistent and easy-to-deploy setup.
+*   **Autonomous Navigation:** Capable of **SLAM** (Simultaneous Localization and Mapping) and fully autonomous, path-planned navigation with the **Nav2** stack (when integrated with a high-level compute unit).
+*   **AI-Powered Perception:** Supports deployment of lightweight AI models (e.g., TFLite) for onboard object detection and classification (when integrated with a high-level compute unit).
+*   **Reproducible Development:** The high-level software environment (when implemented) will be **containerized with Docker**, ensuring a consistent and easy-to-deploy setup.
 *   **Custom Hardware:** Features a custom-designed PCB using **KiCad** for robust power management and peripheral integration.
-*   **Advanced RTOS:** Utilizes **FreeRTOS** on the ESP32-S3 for a lightweight, reliable, and widely-supported firmware foundation.
+*   **Advanced RTOS:** Utilizes **FreeRTOS** on the STM32H7A3 for a lightweight, reliable, and widely-supported firmware foundation.
 
 ## Tech Stack
 
 | Category          | Technology / Tool                                                              |
 | ----------------- | ------------------------------------------------------------------------------ |
-| **Firmware**      | ESP32-S3, **FreeRTOS**, **micro-ROS**, C                                      |
-| **High-Level**    | Raspberry Pi 5, Ubuntu 24.04, **ROS 2 Jazzy**, **Docker**                      |
+| **Firmware**      | STM32H7A3, **FreeRTOS**, **micro-ROS**, C, C++                                |
+| **Wireless Module** | ESP32-S3 (acting as a Wi-Fi/Bluetooth bridge)                                  |
+| **High-Level**    | (Future: Raspberry Pi 5, Ubuntu 24.04, **ROS 2 Jazzy**, **Docker**)            |
 | **Languages**     | C, C++, Python, (exploring **Rust** for performance-critical nodes)            |
-| **AI & Vision**   | OpenCV, TensorFlow Lite                                                        |
+| **AI & Vision**   | OpenCV, TensorFlow Lite (Future: on high-level compute)                        |
 | **Hardware Design** | **KiCad** (Schematics & PCB Layout)                                            |
 | **Version Control** | Git & GitHub                                                                   |
 
 ## System Architecture
 
-The robot employs a two-tier, split-compute architecture, which is standard in modern robotics. This separates safety-critical, real-time tasks from computationally intensive, non-real-time tasks.
+The robot employs a two-tier, split-compute architecture, separating safety-critical, real-time tasks from wireless communication and computationally intensive, non-real-time tasks.
 
-*   **Real-time Control Layer (ESP32-S3):** Running FreeRTOS, this MCU is responsible for all hard real-time operations:
+*   **Real-time Control Layer (STM32H7A3):** Running FreeRTOS, this MCU is responsible for all hard real-time operations:
     *   Motor control via PWM.
     *   Reading wheel encoders for odometry feedback.
     *   Interfacing with low-level sensors like an IMU.
-    *   It communicates with the high-level layer by running a **micro-ROS node**, exposing its functionality as ROS 2 topics, services, and parameters.
+    *   It communicates with the high-level layer (or directly with the micro-ROS agent) via a serial interface (e.g., UART) to the ESP32-S3.
 
-*   **High-Level Processing Layer (Raspberry Pi 5):** Running a Dockerized ROS 2 environment, this SBC is the robot's brain:
+*   **Wireless Communication Module (ESP32-S3):** Configured to act primarily as a Wi-Fi/Bluetooth bridge:
+    *   Handles robust wireless communication (Wi-Fi, Bluetooth).
+    *   Acts as a transport layer for `micro-ROS` messages between the STM32H7A3 and a remote `micro-ROS` agent/ROS 2 ecosystem.
+    *   Potentially offloads some sensor data processing or basic commands.
+
+*   **High-Level Processing Layer (Future Integration - e.g., Raspberry Pi 5):** This SBC will be the robot's brain when integrated:
     *   Hosts the main ROS 2 nodes.
     *   Runs SLAM and navigation algorithms (Nav2).
     *   Performs sensor fusion and computer vision processing.
     *   Executes AI/ML models.
-    *   Handles all wireless communication.
+    *   Connects wirelessly to the ESP32-S3.
 
 ## System Architecture Diagram
 
@@ -56,23 +62,33 @@ The robot employs a two-tier, split-compute architecture, which is standard in m
 %%{init: {"theme": "base", "themeVariables": {"primaryColor": "#2E86C1", "lineColor": "#34495E", "textColor": "#212F3D"}}}%%
 graph TD
     subgraph Robot_Platform["Robot Platform"]
-        subgraph RTL["Real-Time Layer (ESP32-S3 on FreeRTOS)"]
-            FIRMWARE["Firmware (C / FreeRTOS)"]
-            MICROS["micro-ROS Node"]
-            DRIVERS["Motor Drivers & Encoders"]
-            IMU["IMU (I2C/SPI)"]
-            FIRMWARE -->|Controls| DRIVERS
-            FIRMWARE -->|Reads| IMU
+        subgraph RTL["Real-Time Layer (STM32H7A3 on FreeRTOS)"]
+            FIRMWARE_STM["Firmware (C / FreeRTOS)"]
+            DRIVERS_STM["Motor Drivers & Encoders"]
+            IMU_STM["IMU (I2C/SPI)"]
+            FIRMWARE_STM -->|Controls| DRIVERS_STM
+            FIRMWARE_STM -->|Reads| IMU_STM
         end
 
-        subgraph HLL["High-Level Layer (Raspberry Pi 5)"]
+        subgraph WCM["Wireless Communication Module (ESP32-S3)"]
+            ESP_FW["ESP32-S3 Firmware"]
+            WIFI_BT["Wi-Fi / Bluetooth Stack"]
+            SERIAL_BRIDGE["Serial Bridge (UART)"]
+            ESP_FW -->|Manages| WIFI_BT
+            ESP_FW -->|Communicates via| SERIAL_BRIDGE
+        end
+
+        subgraph HLL_FUTURE["Future High-Level Layer (e.g., Raspberry Pi 5)"]
+            direction LR
             DOCKER_CONTAINER["Docker Container"]
             ROS2["ROS 2 Jazzy"]
             NAV2["Navigation (Nav2)"]
             SLAM["Mapping (SLAM Toolbox)"]
             VISION["Vision/AI (OpenCV, TF Lite)"]
-            DOCKER_CONTAINER --> ROS2 --> NAV2 --> SLAM
-            ROS2 --> VISION
+            DOCKER_CONTAINER --- ROS2
+            ROS2 --- NAV2
+            ROS2 --- SLAM
+            ROS2 --- VISION
         end
 
         subgraph HW["Hardware"]
@@ -81,12 +97,14 @@ graph TD
             CAMERA["Camera (CSI/USB)"]
         end
 
-        MICROS -->|micro-ROS over USB-CDC| ROS2
-        ROS2 -->|Drives| CAMERA
-        FIRMWARE -->|Interfaces with| CHASSIS
-        POWER --> FIRMWARE
-        POWER --> ROS2
+        FIRMWARE_STM -->|UART/SPI| SERIAL_BRIDGE
+        WIFI_BT -->|Wi-Fi/micro-ROS over UDP| ROS2
+        FIRMWARE_STM -->|Interfaces with| CHASSIS
+        POWER --> FIRMWARE_STM
+        POWER --> ESP_FW
         POWER --> CHASSIS
+        POWER --> HLL_FUTURE
+        HLL_FUTURE -->|Drives| CAMERA
     end
 
     subgraph Off_Board["Off-Board Tools"]
@@ -100,39 +118,48 @@ graph TD
 
     style DOCKER_CONTAINER fill:#2ECC71,stroke:#27AE60,stroke-width:2px,color:#fff
     style RTL fill:#3498DB,stroke:#2980B9,stroke-width:2px,color:#fff
-````
+    style WCM fill:#F1C40F,stroke:#F39C12,stroke-width:2px,color:#333
+    style HLL_FUTURE fill:#9B59B6,stroke:#8E44AD,stroke-width:2px,color:#fff
+```
 
 ## Project Status
 
 * [x] **Phase 0: Architecture & Technology Selection**
 * [ ] **Phase 1: Hardware Design & Fabrication**
 
-  * [ ] Component selection (motors, drivers, sensors)
+  * [ ] Component selection (motors, drivers, sensors, STM32H7A3, ESP32-S3 module)
   * [ ] PCB design in KiCad
   * [ ] PCB ordering and assembly
   * [ ] Mechanical chassis design (CAD) and 3D printing
-* [ ] **Phase 2: Firmware Development (ESP32-S3)**
+* [ ] **Phase 2: Firmware Development (STM32H7A3)**
 
   * [ ] FreeRTOS base project setup
   * [ ] Motor driver and encoder implementation
   * [ ] IMU driver integration
-  * [ ] micro-ROS node implementation (subscribing to `/cmd_vel`, publishing `/odom`)
-* [ ] **Phase 3: High-Level Software (Raspberry Pi)**
+  * [ ] Serial communication with ESP32-S3
+  * [ ] (Future) `micro-ROS` client integration on STM32H7A3
+* [ ] **Phase 3: Wireless Module Firmware (ESP32-S3)**
+
+  * [ ] ESP-IDF base project setup
+  * [ ] Wi-Fi/Bluetooth configuration as a communication bridge
+  * [ ] Serial communication with STM32H7A3
+  * [ ] `micro-ROS` agent/client implementation on ESP32-S3 for forwarding messages
+* [ ] **Phase 4: High-Level Software (Future: Raspberry Pi / Companion Computer)**
 
   * [ ] Create Dockerfile and Docker Compose for ROS 2 environment
   * [ ] Basic teleoperation node (`teleop_twist_keyboard`)
   * [ ] Create robot description (URDF)
   * [ ] Launch files for core nodes
-* [ ] **Phase 4: Integration & SLAM**
+* [ ] **Phase 5: Integration & SLAM**
 
-  * [ ] Establish robust communication between ESP32-S3 and RPi
+  * [ ] Establish robust communication between STM32H7A3, ESP32-S3, and companion computer
   * [ ] Configure `slam_toolbox` with camera/LiDAR to create a map
   * [ ] Tune odometry and TF frames
-* [ ] **Phase 5: Autonomous Navigation**
+* [ ] **Phase 6: Autonomous Navigation**
 
   * [ ] Configure and tune the Nav2 stack
   * [ ] Achieve successful goal-based navigation in a mapped environment
-* [ ] **Phase 6: AI & Advanced Capabilities**
+* [ ] **Phase 7: AI & Advanced Capabilities**
 
   * [ ] Implement a basic object detection node
   * [ ] (Optional) Rewrite a performance-critical node in Rust
@@ -141,9 +168,9 @@ graph TD
 
 ### Prerequisites
 
-1. Git, FreeRTOS development environment (toolchain, ESP-IDF SDK), ESP32-S3 toolchain.
-2. Docker and Docker Compose installed on your development machine.
-3. A Raspberry Pi 5 with Ubuntu 24.04 and Docker installed.
+1.  Git, STM32 toolchain (e.g., STM32CubeIDE/GCC ARM Embedded), FreeRTOS, ESP-IDF SDK, ESP32-S3 toolchain.
+2.  Docker and Docker Compose installed on your development machine (if using a companion computer).
+3.  A companion computer (e.g., Raspberry Pi 5) with Ubuntu 24.04 and Docker installed (for Phase 4+).
 
 ### Build & Run
 
@@ -156,21 +183,20 @@ WIP
 ├── README.md             # This file: Project overview
 ├── docs/                 # Detailed documentation, requirements, decisions
 ├── hardware/             # KiCad files (schematics, PCB) and mechanical CAD
-├── firmware/             # FreeRTOS project for the ESP32-S3
-├── software/             # ROS 2 packages and Docker configuration for the RPi 5
+├── firmware/             # FreeRTOS project for the STM32H7A3
+├── esp_wireless/         # ESP-IDF project for the ESP32-S3 wireless module
+├── software/             # ROS 2 packages and Docker configuration (for companion computer)
 └── media/                # Images, GIFs, and videos for documentation
 ```
 
 ## Documentation Links
 
-* [Project Requirements](./docs/requirements.md)
-* [Design Decision Log](./docs/decisions_log.md)
-* [Components list](./docs/components.md)
-* [MicroROS tuto on esp32](./docs/microROS_esp32.md)
+*   [Project Requirements](./docs/requirements.md)
+*   [Design Decision Log](./docs/decisions_log.md)
+*   [Components list](./docs/components.md)
+*   [MicroROS with STM32 & ESP32 Integration](./docs/microROS_stm32_esp32.md)
 
 ## License
 
 This project is licensed under the Apache License, Version 2.0.
 See the [LICENSE](./LICENSE) file for details.
-
-```
